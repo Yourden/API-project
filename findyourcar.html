@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://kit.fontawesome.com/57d0f7e8b6.js" crossorigin="anonymous"></script>
+    <title>Document</title>
+  </head>
+  <body id="page__find-cars">
+    <header class="nav">
+        <div class="backdrop"></div>
+      <div class="nav__wrapper">
+        <figure class="nav__logo">
+          <img class="nav__logo--img" src="./assets/header img.png" alt="" />
+          <h1 class="nav__logo--name">
+            <span class="charcoal">Auto</span
+            ><span class="secondary font-weight__900">Seek</span>
+          </h1>
+        </figure>
+        <div class="nav__links">
+          <a class="link" href="index.html">Home</a>
+          <a class="link" href="findyourcar.html">Find your car</a>
+          <a class="contact__link btn" href="">CONTACT</a>
+        </div>
+    </div>
+        <div class="nav__title">
+            <h1>Browse our cars</h1>
+            <div class="input__wrapper">
+                <input id="searchInput" class="input__find" type="text" placeholder="Search by Model, Make, or Keyword"/>
+                <button class="input__btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+        </div>
+    </header>
+    <section id="car__listings--header">
+        <div class="car__listings--heading">
+            <h1>Search results:</h1>
+            <div class="price__slider">
+                <h2>Price range: <span class="secondary">$0 to $100,000</span></h2>
+                <div class="range__slider">
+                    <span class="slider__track"></span>
+                    <input type="range" class="min__val" min="1" max="95000" value="20000" oninput="slideMin()">
+                    <input type="range" class="max__val" min="5000" max="100000" value="80000" oninput="slideMax()">
+                    <div class="tooltip min__tooltip"></div>
+                    <div class="tooltip max__tooltip"></div>
+                </div>
+                <div class="input__box">
+                    <div class="min__box">
+                        <div class="input__wrap">
+                            <span class="input__addon">$</span>
+                            <input type="text" name="min__input" class="input__field min__input" onchange="setMinInput()">
+                        </div>
+                    </div>
+                    <div class="max__box">
+                        <div class="input__wrap">
+                            <span class="input__addon">$</span>
+                            <input type="text" name="max__input" class="input__field max__input" onchange="setMaxInput()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="car__listings">
+      <div class="car__listing">
+        <figure class="car__img--wrapper">
+          <img class="car__img" src="" alt="">
+        </figure>
+        <div class="car__info">
+          <h2 class="car__title">
+            <span class="car__year"></span>
+            <span class="car__make"></span>
+            <span class="car__model"></span>
+          </h2>
+          <div class="car__price"></div>
+          <div class="car__milage"></div>
+        </div>
+      </div>
+      <div class="car__listing">
+        <figure class="car__img--wrapper">
+          <img class="car__img" src="" alt="">
+        </figure>
+        <div class="car__info">
+          <h2 class="car__title">
+            <span class="car__year"></span>
+            <span class="car__make"></span>
+            <span class="car__model"></span>
+          </h2>
+          <div class="car__price"></div>
+          <div class="car__milage"></div>
+        </div>
+      </div>
+      <div class="car__listing">
+        <figure class="car__img--wrapper">
+          <img class="car__img" src="" alt="">
+        </figure>
+        <div class="car__info">
+          <h2 class="car__title">
+            <span class="car__year"></span>
+            <span class="car__make"></span>
+            <span class="car__model"></span>
+          </h2>
+          <div class="car__price"></div>
+          <div class="car__milage"></div>
+        </div>
+      </div>
+    </section>
+    <script src="index.js"></script>
+  </body>
+</html>

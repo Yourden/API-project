@@ -1,0 +1,514 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Roboto", "Arial";
+}
+
+body {
+  background-color: #fff;
+  max-width: 100vw;
+}
+
+a {
+  text-decoration: none;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+a,
+li,
+div {
+  color: #2c4754;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.secondary {
+  color: #3b9ada;
+}
+
+.charcoal {
+  color: #2c4754;
+}
+
+.font-weight__900 {
+  font-weight: 900;
+}
+
+h1 {
+  font-size: 50px;
+}
+
+.btn:hover {
+  background-color: #007fff;
+  cursor: pointer;
+}
+
+.btn:active {
+  background-color: #0072e5;
+  transform: scale(0.9);
+}
+
+.link {
+  position: relative;
+}
+
+.link:after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0px;
+  background-color: #242424;
+  height: 4px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.link:hover:after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* NAV */
+
+.nav {
+  position: relative;
+  height: 100px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.nav__wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100px;
+  padding: 0 50px;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.nav__links {
+  display: flex;
+  justify-content: space-evenly;
+  max-width: 430px;
+  width: 100%;
+  margin: 0;
+  align-items: center;
+}
+
+.nav__logo {
+  width: 250px;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.nav__logo--img {
+  width: 50%;
+  height: 100%;
+  margin-top: 10px;
+}
+
+.nav__logo--name {
+  font-size: 24px;
+  white-space: nowrap;
+}
+
+.contact__link {
+  background-color: #3b9ada;
+  padding: 12px 40px;
+  border-radius: 50px;
+  color: white !important;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  transition: all 300ms ease;
+}
+
+/* NAV FIND YOUR CAR */
+
+#page__find-cars .nav {
+    position: relative;
+    height: 326px;
+}
+
+#page__find-cars .nav__wrapper {
+    z-index: 1;
+    position: relative;
+    top: -36%
+}
+
+.backdrop {
+  background-image: url(./assets/car\ parking\ lot.jpg);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  background-size:cover;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+}
+
+.backdrop::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(59, 154, 218, 0.45);
+  background: linear-gradient(
+      160deg,
+      rgba(36, 36, 36, 0.75) 0%,
+      rgba(59, 154, 218, 0.75) 100%
+  );
+  pointer-events: none;
+}
+
+#page__find-cars .nav__logo--name, #page__find-cars .charcoal,#page__find-cars .link {
+    color: #fff;
+}
+
+#page__find-cars .contact__link {
+    background-color: white;
+    color:#3b9ada !important;
+}
+
+#page__find-cars .nav__logo, #page__find-cars .nav__links {
+    z-index: 2;
+}
+
+#page__find-cars .nav__logo--img {
+    filter: brightness(2000%);
+}
+
+.nav__title {
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  text-align: center;
+  color: white;
+  max-width: 1400px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav__title h1 {
+  font-size: 56px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 40px;
+  letter-spacing: 4px;
+}
+
+#page__find-cars .input__btn {
+    height: 60px;
+}
+
+.input__wrapper {
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+}
+
+#page__find-cars .input__find {
+    border: none;
+}
+
+#page__find-cars .link::after {
+    background-color: white;
+}
+
+
+/* LANDING PAGE */
+
+#landing-page {
+  padding: 10px 20px;
+}
+
+.landing-page__wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.landing-page__heading {
+  max-width: 730px;
+  color: #3b9ada;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 30px;
+}
+
+.landing-page__sub-title {
+  margin-bottom: 40px;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.input__find {
+  height: 70px;
+  width: 50%;
+  font-size: 24px;
+  outline: none;
+  border-radius: 20px;
+  border: 1px solid #2c4754;
+  line-height: 40px;
+  padding: 0 15px;
+}
+
+.landing-page__input {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.input__wrapper {
+  display: flex;
+  position: relative;
+}
+
+.input__btn {
+  position: absolute;
+  right: 27%;
+  margin-left: 20px;
+  border-radius: 20px;
+  font-size: 36px;
+  background-color: #fff;
+  border: none;
+  color: #3b9ada;
+  transition: all 300ms ease;
+}
+
+.input__btn:hover {
+  color: #007fff;
+  cursor: pointer;
+}
+
+.input__btn:active {
+  color: #0072e5;
+  transform: scale(0.9);
+}
+
+
+.landing-page__listings {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.listing__box {
+  width: 160px;
+  height: 160px;
+  border: 1px solid black;
+  margin: 0 56px;
+}
+
+/* CAR LISTINGS  */
+
+#car__listings--header {
+    padding: 40px 20px;
+}
+
+#car__listings--header h1 {
+    font-size: 28px;
+}
+
+.car__listings--heading {
+    margin: 0 80px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.price__filter h2 {
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.price__filter h2 span {
+    margin-left: 12px;
+}
+
+/* PRICE FILTER */
+
+.price__slider h2 {
+    margin-bottom: 36px;
+}
+
+.range__slider {
+    position: relative;
+    width: 100%;
+    height: 7px;
+    border-radius: 4px;
+    background-color: #86c4ed;
+}
+
+.slider__track {
+    position: absolute;
+    height: 100%;
+    border-radius: 4px;
+    background-color: #0072e5;
+}
+
+.range__slider input {
+    position: absolute;
+    width: 100%;
+    background: none;
+    pointer-events: none;
+    top: 50%;
+    transform: translateY(-50%);
+    appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    border: 3px solid #242424;
+    background: #fff;
+    pointer-events: auto;
+    appearance: none;
+    cursor: pointer;
+    box-shadow: 0 0.125rem .5625rem -0.125rem rgba(0, 0, 0, .25);
+}
+
+input[type="range"]::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    background: #fff;
+    pointer-events: auto;
+    -moz-appearance: none;
+    cursor: pointer;
+    box-shadow: 0 0.125rem .5625rem -0.125rem rgba(0, 0, 0, .25);
+}
+
+.tooltip {
+    padding: .25rem .50rem;
+    border: 0;
+    color: #fff;
+    background: #242424;
+    font-size: .75rem;
+    border-radius: .25rem;
+    top: -160%;
+    display: block;
+    position: absolute;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.min__tooltip {
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%);
+    z-index: 5;
+    transition: transform 300ms ease;
+}
+
+.max__tooltip {
+    right: 50%;
+    transform: translateX(50%) translateY(-100%);
+    transition: transform 300ms ease;
+}
+
+.input__box {
+    display: flex;
+    margin-top: 18px;
+}
+
+.min__box,
+.max__box {
+    width: 50%;
+}
+
+.min__box {
+    margin-right: 18px;
+}
+
+.input__wrap {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+}
+
+.input__addon {
+    display: flex;
+    align-items: center;
+    padding: .625rem 1rem;
+    font-size: .93rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #4b566b;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #fff;
+    border: 1px solid #d4d7e5;
+    border-radius: .25rem;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input__field {
+    margin-left: -1px;
+    padding: .425rem .75rem;
+    font-size: .8125rem;
+    border-radius: .25rem;
+    position: relative;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    color: #4b566b;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #d4d7e5;
+    border-top-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input__field:focus {
+    outline: none;
+}
+
+/* CAR LISTINGS */
+
+.car__listing {
+  border: 1px solid black;
+  height: 300px;
+  width: 33%;
+  margin: 50px 50px;
+}
+
+#car__listings {
+  display: flex;
+  
+}
