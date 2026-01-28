@@ -1,134 +1,231 @@
-window.onload = function() {
-  slideMin();
-  slideMax();
-  getCars();
-}
 
+/* ---------- DOM SELECTORS ---------- */
 const minVal = document.querySelector(".min__val");
 const maxVal = document.querySelector(".max__val");
 const priceInputMin = document.querySelector(".min__input");
 const priceInputMax = document.querySelector(".max__input");
 const minTooltip = document.querySelector(".min__tooltip");
 const maxTooltip = document.querySelector(".max__tooltip");
-const minGap = 5000;
 const range = document.querySelector(".slider__track");
-const sliderMinValue = parseInt(minVal.min);
-const sliderMaxValue = parseInt(maxVal.max);
 
+const searchInput = document.getElementById("searchInput");
+const listingsContainer = document.getElementById("listings__container");
+
+/* ---------- CONFIG ---------- */
+const minGap = 5000;
+const sliderMinValue = minVal ? parseInt(minVal.min, 10) : 0;
+const sliderMaxValue = maxVal ? parseInt(maxVal.max, 10) : 100000;
+
+// const MARKETCHECK_API_KEY = "yUohXNeX1BI8FmO3amUzSvAGUWMH86xX";
+const DEFAULT_ROWS = 1;
+
+
+function debounce(fn, delay) {
+  let timeoutId;
+
+  return function (...args) {
+    clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+}
+
+const debouncedGetCars = debounce((value) => {
+  getCars(value);
+}, 750);
+
+/* ---------- INIT ---------- */
+window.addEventListener("load", () => {
+  slideMin();
+  slideMax();
+  getCars("");
+});
+
+/* ---------- SLIDER UI ---------- */
 function slideMin() {
-    let gap = parseInt(maxVal.value) - parseInt(minVal.value);
-    if (gap <= minGap) {
-        minVal.value = parseInt(maxVal.value) - minGap;
-    }
-    minTooltip.innerHTML = "$" + minVal.value;
-    priceInputMin.value = minVal.value;
-    setArea();
+  if (!minVal || !maxVal) return;
+
+  let gap = parseInt(maxVal.value, 10) - parseInt(minVal.value, 10);
+  if (gap <= minGap) minVal.value = parseInt(maxVal.value, 10) - minGap;
+
+  if (minTooltip) minTooltip.innerHTML = "$" + Number(minVal.value).toLocaleString();
+  if (priceInputMin) priceInputMin.value = minVal.value;
+
+  setArea();
+  debouncedGetCars(searchInput ? searchInput.value : "");
 }
 
 function slideMax() {
-    let gap = parseInt(maxVal.value) - parseInt(minVal.value);
-    if (gap <= minGap) {
-        maxVal.value = parseInt(minVal.value) + minGap;
-    }
-    maxTooltip.innerHTML = "$" + maxVal.value;
-    priceInputMax.value =  maxVal.value;
-    setArea();
+  if (!minVal || !maxVal) return;
+
+  let gap = parseInt(maxVal.value, 10) - parseInt(minVal.value, 10);
+  if (gap <= minGap) maxVal.value = parseInt(minVal.value, 10) + minGap;
+
+  if (maxTooltip) maxTooltip.innerHTML = "$" + Number(maxVal.value).toLocaleString();
+  if (priceInputMax) priceInputMax.value = maxVal.value;
+
+  setArea();
+  debouncedGetCars(searchInput ? searchInput.value : "");
 }
 
 function setArea() {
-    range.style.left = (minVal.value / sliderMaxValue) * 100 + "%";
-    minTooltip.style.left = (minVal.value / sliderMaxValue) * 100 + "%";
-    range.style.right = 100 - (maxVal.value / sliderMaxValue) * 100 + "%";
-    maxTooltip.style.right = 100 - (maxVal.value / sliderMaxValue) * 100 + "%";
-    if (maxVal.value - minVal.value < 12500) {
-        maxTooltip.style.transform = "translateX(85%) translateY(-100%)";
-        minTooltip.style.transform = "translateX(-85%) translateY(-100%)";
-    } 
-    else {
-        maxTooltip.style.transform = "translateX(50%) translateY(-100%)";
-        minTooltip.style.transform = "translateX(-50%) translateY(-100%)";
-    }
+  if (!range || !minVal || !maxVal) return;
+
+  const minPct = (minVal.value / sliderMaxValue) * 100;
+  const maxPct = (maxVal.value / sliderMaxValue) * 100;
+
+  range.style.left = minPct + "%";
+  range.style.right = (100 - maxPct) + "%";
+
+  if (minTooltip) minTooltip.style.left = minPct + "%";
+  if (maxTooltip) maxTooltip.style.right = (100 - maxPct) + "%";
 }
 
 function setMinInput() {
-    let minPrice = parseInt(priceInputMin.value);
-    if (minPrice < sliderMinValue) {
-        priceInputMin.value = sliderMinValue;
-    }
-    minVal.value = priceInputMin.value;
-    slideMin();
+  if (!minVal || !priceInputMin) return;
+
+  let minPrice = parseInt(priceInputMin.value, 10);
+  if (Number.isNaN(minPrice) || minPrice < sliderMinValue) priceInputMin.value = sliderMinValue;
+
+  minVal.value = priceInputMin.value;
+  slideMin();
 }
 
 function setMaxInput() {
-    let maxPrice = parseInt(priceInputMax.value);
-    if (maxPrice > sliderMaxValue) {
-        priceInputMax.value = sliderMaxValue;
-    }
-    maxVal.value = priceInputMax.value;
-    slideMax();
+  if (!maxVal || !priceInputMax) return;
+
+  let maxPrice = parseInt(priceInputMax.value, 10);
+  if (Number.isNaN(maxPrice) || maxPrice > sliderMaxValue) priceInputMax.value = sliderMaxValue;
+
+  maxVal.value = priceInputMax.value;
+  slideMax();
 }
 
-// 
+/* ---------- API ---------- */
 
-// LISTINGS
+const makeCache = new Map();
 
-// 
+async function isMake(word) {
+  word = word.toLowerCase();
+  if (makeCache.has(word)) {
+    return makeCache.get(word);
+  }
 
-async function getCars(searchTerm = "") {
   const params = new URLSearchParams({
-    api_key: "yUohXNeX1BI8FmO3amUzSvAGUWMH86xX",
-    state: "FL",
-    rows: 10
+    api_key: MARKETCHECK_API_KEY,
+    input: word,
+    field: "make",
   });
 
-  const value = searchTerm.trim();
+  const url = `https://api.marketcheck.com/v2/specs/car/auto-complete?${params.toString()}`;
 
-  if (/^\d{4}$/.test(value)) {
-    params.append("year", value);
-  } 
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
 
-  else {
-    params.append("keyword" || "state:" || "city:", value);
+    const data = await res.json();
+
+    const isValidMake = Array.isArray(data.terms) && data.terms.length > 0;
+    makeCache.set(word, isValidMake);
+    return isValidMake;
+
+  } catch (err) {
+  console.error(err);
+  makeCache.set(word, false);
+  return false;
+  }
+  
+}
+
+async function getCars(searchTerm = "") {
+  if (!listingsContainer) return;
+
+  const params = new URLSearchParams({
+    api_key: MARKETCHECK_API_KEY,
+    rows: String(DEFAULT_ROWS),
+  });
+
+  const q = (searchTerm || "").trim().toLowerCase();
+  const parts = q.split(/\s+/);
+  
+  const year = parts.find(part => /^\d{4}$/.test(part));
+
+  if (year) {
+    params.set("year", year)
+  }
+
+
+    
+
+  // if (q.length > 0) params.set("model", q); previous code to search by model only
+  // if (q.length > 0 && /\d{4}/.test(q)) params.set("year", q); 
+
+  if (minVal && maxVal) {
+    const minPrice = minVal.value;
+    const maxPrice = maxVal.value;
+
+    params.set("price_range", `${minPrice}-${maxPrice}`)
   }
 
   const url = `https://api.marketcheck.com/v2/search/car/active?${params.toString()}`;
 
   try {
-    const response = await fetch(url);
-    const data = await response.json();
+    listingsContainer.innerHTML = "<p>Loading...</p>";
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+
+    const data = await res.json();
+    console.log(data.listings)
     renderCars(data.listings || []);
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
+    listingsContainer.innerHTML = "<p>Failed to load listings.</p>";
   }
+ 
 }
 
-
+/* ---------- RENDER ---------- */
 function renderCars(cars) {
-    const container = document.getElementById("car__listings")
-    container.innerHTML = ""
+  if (!listingsContainer) return;
 
-if (cars.length === 0) {
-    container.innerHTML = "<p>No results found</p>"
-    return
-}
+  listingsContainer.innerHTML = "";
 
-cars.forEach(car => {
+  if (!cars || cars.length === 0) {
+    listingsContainer.innerHTML = "<p>No results found</p>";
+    return;
+  }
+
+  cars.forEach((car) => {
     const div = document.createElement("div");
     div.className = "car__listing";
 
-    div.innerHTML = `<img src="${car.media?.photo_links?.[0] || ''}" width="200" />
-      <h3>${car.build?.year} ${car.build?.make} ${car.build?.model}</h3>
-      <p>$${car.price}</p>
-      <p>${car.miles} miles</p>
+    const photo = car.media?.photo_links?.[0] || "";
+    const year = car.build?.year || "";
+    const make = car.build?.make || "";
+    const model = car.build?.model || "";
+    const price = car.price != null ? `$${Number(car.price).toLocaleString()}` : "Price N/A";
+    const miles = car.miles != null ? `${Number(car.miles).toLocaleString()} miles` : "Miles N/A";
+
+    div.innerHTML = `
+      <img src="${photo}" alt="${year} ${make} ${model}" width="200" />
+      <h3>${year} ${make} ${model}</h3>
+      <p>${price}</p>
+      <p>${miles}</p>
     `;
 
-    container.appendChild(div)
-})
+    listingsContainer.appendChild(div);
+  });
 }
 
-const searchInput = document.getElementById("searchInput");
+/* ---------- EVENTS (basic) ---------- */
+if (searchInput) {
+  searchInput.addEventListener("input", (e) => {
+    debouncedGetCars(e.target.value);
+  });
+}
 
-searchInput.addEventListener("input", (e) => {
-    const value = e.target.value.trim();
-    getCars(value);
-})
+
+// Your HTML currently uses oninput="slideMin()" / slideMax() and onchange="setMinInput()" etc.
+// You can keep those for now while you learn, or convert them to addEventListener later.

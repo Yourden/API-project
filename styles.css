@@ -154,6 +154,16 @@ h1 {
     top: -36%
 }
 
+.nav__bar {
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: #3b9ada;
+    z-index: 5;
+}
+
 .backdrop {
   background-image: url(./assets/car\ parking\ lot.jpg);
   background-repeat: no-repeat;
@@ -273,19 +283,19 @@ h1 {
 }
 
 .input__find {
+  width: 100%;
   height: 70px;
-  width: 50%;
+  padding: 0 60px;
   font-size: 24px;
   outline: none;
   border-radius: 20px;
   border: 1px solid #2c4754;
   line-height: 40px;
-  padding: 0 15px;
 }
 
 .landing-page__input {
-  display: flex;
-  width: 100%;
+  position: relative;
+  width: 50%;
   justify-content: center;
 }
 
@@ -296,8 +306,9 @@ h1 {
 
 .input__btn {
   position: absolute;
-  right: 27%;
-  margin-left: 20px;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
   border-radius: 20px;
   font-size: 36px;
   background-color: #fff;
@@ -313,7 +324,7 @@ h1 {
 
 .input__btn:active {
   color: #0072e5;
-  transform: scale(0.9);
+  transform: translateY(-50%) scale(0.9);
 }
 
 
@@ -334,7 +345,7 @@ h1 {
 /* CAR LISTINGS  */
 
 #car__listings--header {
-    padding: 40px 20px;
+    padding: 40px 20px 80px 20px;
 }
 
 #car__listings--header h1 {
@@ -499,16 +510,49 @@ input[type="range"]::-moz-range-thumb {
     outline: none;
 }
 
-/* CAR LISTINGS */
-
-.car__listing {
-  border: 1px solid black;
-  height: 300px;
-  width: 33%;
-  margin: 50px 50px;
+#car__listings {
+  width: 100%;
+}
+ 
+#listings__container {
+  display: grid;
+  grid-template-columns: repeat(260, minmax(260px, 1fr));
+  gap: 24px;
+  padding: 0 80px 80px;
+  width: 80%;
+  margin: 0 auto;
 }
 
-#car__listings {
-  display: flex;
-  
+
+.car__listing {
+  border: 1px solid #d4d7e5;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 0.125rem 0.5625rem -0.125rem rgba(0, 0, 0, 0.15);
+}
+
+
+.car__listing img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+
+.car__listing h3 {
+  font-size: 18px;
+  padding: 14px 14px 6px;
+}
+
+.car__listing p {
+  padding: 0 14px 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.car__listing:hover {
+  transform: translateY(-2px);
+  transition: all 300ms ease;
 }

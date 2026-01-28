@@ -31,18 +31,17 @@
                 <button class="input__btn"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
         </div>
+        <div class="nav__bar"></div>
     </header>
     <section id="car__listings--header">
         <div class="car__listings--heading">
             <h1>Search results:</h1>
             <div class="price__slider">
-                <h2>Price range: <span class="secondary">$0 to $100,000</span></h2>
+                <h2>Price range: <span class="secondary"><span class="min__tooltip">$0</span> to <span class="max__tooltip">$100,000</span></span></h2>
                 <div class="range__slider">
                     <span class="slider__track"></span>
                     <input type="range" class="min__val" min="1" max="95000" value="20000" oninput="slideMin()">
                     <input type="range" class="max__val" min="5000" max="100000" value="80000" oninput="slideMax()">
-                    <div class="tooltip min__tooltip"></div>
-                    <div class="tooltip max__tooltip"></div>
                 </div>
                 <div class="input__box">
                     <div class="min__box">
@@ -62,48 +61,9 @@
         </div>
     </section>
     <section id="car__listings">
-      <div class="car__listing">
-        <figure class="car__img--wrapper">
-          <img class="car__img" src="" alt="">
-        </figure>
-        <div class="car__info">
-          <h2 class="car__title">
-            <span class="car__year"></span>
-            <span class="car__make"></span>
-            <span class="car__model"></span>
-          </h2>
-          <div class="car__price"></div>
-          <div class="car__milage"></div>
+        <div id="listings__container">
+            
         </div>
-      </div>
-      <div class="car__listing">
-        <figure class="car__img--wrapper">
-          <img class="car__img" src="" alt="">
-        </figure>
-        <div class="car__info">
-          <h2 class="car__title">
-            <span class="car__year"></span>
-            <span class="car__make"></span>
-            <span class="car__model"></span>
-          </h2>
-          <div class="car__price"></div>
-          <div class="car__milage"></div>
-        </div>
-      </div>
-      <div class="car__listing">
-        <figure class="car__img--wrapper">
-          <img class="car__img" src="" alt="">
-        </figure>
-        <div class="car__info">
-          <h2 class="car__title">
-            <span class="car__year"></span>
-            <span class="car__make"></span>
-            <span class="car__model"></span>
-          </h2>
-          <div class="car__price"></div>
-          <div class="car__milage"></div>
-        </div>
-      </div>
     </section>
     <script src="index.js"></script>
   </body>
