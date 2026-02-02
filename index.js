@@ -15,7 +15,7 @@ const minGap = 5000;
 const sliderMinValue = minVal ? parseInt(minVal.min, 10) : 0;
 const sliderMaxValue = maxVal ? parseInt(maxVal.max, 10) : 100000;
 
-const MARKETCHECK_API_KEY = "yUohXNeX1BI8FmO3amUzSvAGUWMH86xX";
+// const MARKETCHECK_API_KEY = "yUohXNeX1BI8FmO3amUzSvAGUWMH86xX";
 const DEFAULT_ROWS = 1;
 
 function debounce(fn, delay) {
@@ -128,6 +128,7 @@ async function isMake(word) {
     if (!res.ok) throw new Error(`API error: ${res.status}`);
 
     const data = await res.json();
+    console.log("autocomplete raw repsonse:", data);
 
     const isValidMake = Array.isArray(data.terms) && data.terms.length > 0;
     makeCache.set(word, isValidMake);
@@ -136,7 +137,7 @@ async function isMake(word) {
     console.error(err);
     makeCache.set(word, false);
     return false;
-  }
+  } 
 }
 
 async function getCars(searchTerm = "") {
@@ -151,21 +152,30 @@ async function getCars(searchTerm = "") {
   const parts = q.split(/\s+/);
   const year = parts.find((part) => /^\d{4}$/.test(part));
   const rest = parts.filter((part) => part !== year);
-  const isMakeResult = await isMake(firstPart);
-  const firstPart = parts[0];
+  const firstToken = rest[0];
+  const isMakeResult = firstToken ? await isMake(firstToken) : false;
+
+  
 
   if (year) {
     params.set("year", year);
   }
-  if (parts.length > 0 && isMakeResult) {
-      params.set("make", firstPart);
-  } if (!isMakeResult) {
-    params.set("keyword", q);
-  }
-  console.log({ year, rest, isMakeResult });
-  // if (q.length > 0) params.set("model", q); previous code to search by model only
-  // if (q.length > 0 && /\d{4}/.test(q)) params.set("year", q);
 
+  if (rest.length > 0) {
+    if (isMakeResult) {
+      params.set("make", firstToken);
+  
+      if (rest.length > 1) {
+        params.set("model", rest.slice(1).join(" "));
+      }
+    } else {
+    params.set("model", rest[0]);
+  }
+}
+  console.log({ year, rest, isMakeResult });
+  
+
+  // SETTING SLIDER PRICING IN API //
   if (minVal && maxVal) {
     const minPrice = minVal.value;
     const maxPrice = maxVal.value;
@@ -175,13 +185,13 @@ async function getCars(searchTerm = "") {
 
   const url = `https://api.marketcheck.com/v2/search/car/active?${params.toString()}`;
 
+  console.log(url)
   try {
     listingsContainer.innerHTML = "<p>Loading...</p>";
     const res = await fetch(url);
     if (!res.ok) throw new Error(`API error: ${res.status}`);
 
     const data = await res.json();
-    console.log(data.listings);
     renderCars(data.listings || []);
   } catch (err) {
     console.error(err);
