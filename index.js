@@ -15,8 +15,8 @@ const minGap = 5000;
 const sliderMinValue = minVal ? parseInt(minVal.min, 10) : 0;
 const sliderMaxValue = maxVal ? parseInt(maxVal.max, 10) : 100000;
 
-// const MARKETCHECK_API_KEY = "yUohXNeX1BI8FmO3amUzSvAGUWMH86xX";
-const DEFAULT_ROWS = 1;
+const MARKETCHECK_API_KEY = "yUohXNeX1BI8FmO3amUzSvAGUWMH86xX";
+const DEFAULT_ROWS = 10;
 
 function debounce(fn, delay) {
   let timeoutId;
@@ -107,6 +107,38 @@ function setMaxInput() {
 
 /* ---------- API ---------- */
 
+const trimCache = new Map();
+
+async function isTrim(trimQuery, make, model) {
+  const key = `${trimQuery}|${make}|${model}`.toLowerCase();
+  if (trimCache.has(key)) return trimCache.get(key);
+
+  const params = new URLSearchParams({
+    api_key: MARKETCHECK_API_KEY,
+    field: "trim",
+    input: trimQuery,
+    term_counts: "false",
+  });
+
+  if (make) params.set("make", make);
+  if (model) params.set("model", model);
+
+  const url = `https://api.marketcheck.com/v2/search/car/auto-complete?${params.toString()}`;
+console.log("Trim autocomplete URL:", url);
+  const res = await fetch(url);
+  if (!res.ok) return null;
+
+  const data = await res.json();
+
+  const terms = Array.isArray(data) ? data : (data.terms || []);
+  const best = terms[0] || null;
+
+  trimCache.set(key, best);
+  return best;
+}
+
+
+
 const makeCache = new Map();
 
 async function isMake(word) {
@@ -128,7 +160,7 @@ async function isMake(word) {
     if (!res.ok) throw new Error(`API error: ${res.status}`);
 
     const data = await res.json();
-    console.log("autocomplete raw repsonse:", data);
+    console.log("autocomplete raw repsonse:", data, word);
 
     const isValidMake = Array.isArray(data.terms) && data.terms.length > 0;
     makeCache.set(word, isValidMake);
@@ -140,6 +172,50 @@ async function isMake(word) {
   } 
 }
 
+const modelTermCache = new Map();
+
+async function resolveModelTerm(input, make) {
+  const key = `${input}|${make || ""}`.toLowerCase();
+  if (modelTermCache.has(key)) return modelTermCache.get(key);
+
+  const params = new URLSearchParams({
+    api_key: MARKETCHECK_API_KEY,
+    field: "model",
+    input,
+    term_counts: "false",
+  });
+
+  if (make) params.set("make", make);
+
+  const url = `https://api.marketcheck.com/v2/search/car/auto-complete?${params.toString()}`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+
+    const data = await res.json();
+    const terms = data.terms || [];
+
+    const want = normToken(input);
+
+    const best =
+      terms.find((t) => normToken(t) === want) ||
+      terms[0] ||
+      null;
+
+    modelTermCache.set(key, best);
+    return best;
+  } catch (err) {
+    console.error(err);
+    modelTermCache.set(key, null);
+    return null;
+  }
+}
+
+function normToken(s) {
+  return (s || "").toLowerCase().replace(/[-\s]/g, "");
+}
+
 async function getCars(searchTerm = "") {
   if (!listingsContainer) return;
 
@@ -149,50 +225,99 @@ async function getCars(searchTerm = "") {
   });
 
   const q = (searchTerm || "").trim().toLowerCase();
-  const parts = q.split(/\s+/);
+  const parts = q.split(/\s+/).filter(Boolean);
+
   const year = parts.find((part) => /^\d{4}$/.test(part));
   const rest = parts.filter((part) => part !== year);
-  const firstToken = rest[0];
-  const isMakeResult = firstToken ? await isMake(firstToken) : false;
 
-  
+  const COLORS = [
+    "black","white","gray","grey","silver","blue","red","green","yellow","orange",
+    "brown","beige","tan","gold","purple","pink","maroon","navy","teal","lime",
+    "cyan","magenta","violet","indigo","turquoise","peach","coral",
+  ];
 
-  if (year) {
-    params.set("year", year);
+  // 1) detect make anywhere
+  let detectedMake = null;
+  for (const token of rest) {
+    if (await isMake(token)) {
+      detectedMake = token;
+      break;
+    }
   }
 
-  if (rest.length > 0) {
-    if (isMakeResult) {
-      params.set("make", firstToken);
-  
-      if (rest.length > 1) {
-        params.set("model", rest.slice(1).join(" "));
-      }
+  // 2) detect colors
+  const colorsFound = rest.filter((w) => COLORS.includes(w));
+
+  // remove make + colors from remaining tokens
+  const remainingTokens = rest.filter(
+    (w) => w !== detectedMake && !COLORS.includes(w)
+  );
+
+  // 3) model/trim split (works even with no make)
+  let modelTokens = [];
+  let trimTokens = [];
+
+  if (remainingTokens.length) {
+    const first = remainingTokens[0];
+
+    const modelTerm = await resolveModelTerm(first, detectedMake || undefined);
+
+    if (modelTerm && normToken(modelTerm) === normToken(first)) {
+      modelTokens = [modelTerm.toLowerCase()];
+      trimTokens = remainingTokens.slice(1);
     } else {
-    params.set("model", rest[0]);
+      modelTokens = [];
+      trimTokens = remainingTokens;
+    }
   }
-}
-  console.log({ year, rest, isMakeResult });
-  
 
-  // SETTING SLIDER PRICING IN API //
+  // 4) trim resolution (allowed with make-only / no model)
+  const trimQuery = trimTokens.join(" ");
+  let detectedTrim = null;
+
+  if (trimQuery) {
+    detectedTrim = await isTrim(trimQuery, detectedMake, modelTokens[0] || "");
+  }
+
+  // 5) set params
+  if (year) params.set("year", year);
+  if (detectedMake) params.set("make", detectedMake);
+  if (modelTokens.length) params.set("model", modelTokens.join(" "));
+  if (detectedTrim) params.set("trim", detectedTrim);
+  if (colorsFound.length) params.set("base_ext_color", colorsFound[0]);
+
   if (minVal && maxVal) {
-    const minPrice = minVal.value;
-    const maxPrice = maxVal.value;
-
-    params.set("price_range", `${minPrice}-${maxPrice}`);
+    params.set("price_range", `${minVal.value}-${maxVal.value}`);
   }
 
   const url = `https://api.marketcheck.com/v2/search/car/active?${params.toString()}`;
+  console.log("REQUEST:", url, { year, detectedMake, modelTokens, trimTokens, trimQuery, detectedTrim });
 
-  console.log(url)
   try {
     listingsContainer.innerHTML = "<p>Loading...</p>";
     const res = await fetch(url);
     if (!res.ok) throw new Error(`API error: ${res.status}`);
 
     const data = await res.json();
-    renderCars(data.listings || []);
+    const listings = data.listings || [];
+
+    // keep your existing trim token filter as a backup (optional)
+    const filtered = trimTokens.length
+      ? listings.filter((car) => {
+          const text = [
+            car.build?.model,
+            car.build?.trim,
+            car.heading,
+          ].filter(Boolean).join(" ").toLowerCase();
+
+          return trimTokens.every((t) => text.includes(t));
+        })
+      : listings;
+
+    console.log("API listings count:", listings.length);
+    console.log("After trim filter:", filtered.length);
+
+    renderCars(filtered);
   } catch (err) {
     console.error(err);
     listingsContainer.innerHTML = "<p>Failed to load listings.</p>";
@@ -245,5 +370,3 @@ if (searchInput) {
   });
 }
 
-// Your HTML currently uses oninput="slideMin()" / slideMax() and onchange="setMinInput()" etc.
-// You can keep those for now while you learn, or convert them to addEventListener later.
