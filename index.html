@@ -31,15 +31,14 @@
         </h1>
         <h2 class="landing-page__sub-title">The <span class="secondary">Easy</span> Way to Find the <span class="secondary">Right</span> Car</h2>
         <div class="landing-page__input">
-          <input class="input__find" type="text" placeholder="Search by Model, Make, or Keyword" />
-          <button class="input__btn btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+          <input class="input__find" id="searchInput" type="text" placeholder="Search by Model, Make, or Keyword" />
+          <button onclick="window.location.href=`findyourcar.html`" class="input__btn btn"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
       </div>
-      <div class="landing-page__listings">
-        <div class="listing__box"></div>
-        <div class="listing__box"></div>
-        <div class="listing__box"></div>
+      <div class="landing-page__listings" id="listings__container">
+        
       </div>
     </section>
+    <script src="index.js"></script>
   </body>
 </html>

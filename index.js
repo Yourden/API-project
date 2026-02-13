@@ -9,7 +9,7 @@ const range = document.querySelector(".slider__track");
 
 const searchInput = document.getElementById("searchInput");
 const listingsContainer = document.getElementById("listings__container");
-
+const landingSearchInput = document.querySelector("#landing-page .input__find");
 /* ---------- CONFIG ---------- */
 const minGap = 5000;
 const sliderMinValue = minVal ? parseInt(minVal.min, 10) : 0;
@@ -38,7 +38,16 @@ const debouncedGetCars = debounce((value) => {
 window.addEventListener("load", () => {
   slideMin();
   slideMax();
-  getCars("");
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialSearch = urlParams.get("search");
+
+  if (initialSearch && searchInput) {
+    searchInput.value = initialSearch;
+    getCars(initialSearch);
+  } else {
+    getCars("");
+  }
 });
 
 /* ---------- SLIDER UI ---------- */
@@ -136,8 +145,6 @@ console.log("Trim autocomplete URL:", url);
   trimCache.set(key, best);
   return best;
 }
-
-
 
 const makeCache = new Map();
 
@@ -370,3 +377,11 @@ if (searchInput) {
   });
 }
 
+if (landingSearchInput) {
+  landingSearchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      window.location.href =
+        `findyourcar.html?search=${encodeURIComponent(landingSearchInput.value)}`;
+    }
+  });
+}

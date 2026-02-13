@@ -297,6 +297,7 @@ h1 {
   position: relative;
   width: 50%;
   justify-content: center;
+  margin-bottom: 40px;
 }
 
 .input__wrapper {
