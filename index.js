@@ -149,7 +149,7 @@ console.log("Trim autocomplete URL:", url);
 const makeCache = new Map();
 
 async function isMake(word) {
-  word = word.toLowerCase();
+  word = word.toLowerCase().trim();
   if (makeCache.has(word)) {
     return makeCache.get(word);
   }
@@ -167,16 +167,29 @@ async function isMake(word) {
     if (!res.ok) throw new Error(`API error: ${res.status}`);
 
     const data = await res.json();
-    console.log("autocomplete raw repsonse:", data, word);
+    console.log("autocomplete raw response:", data, word);
 
-    const isValidMake = Array.isArray(data.terms) && data.terms.length > 0;
-    makeCache.set(word, isValidMake);
-    return isValidMake;
+    const terms = Array.isArray(data.terms) ? data.terms : [];
+
+    if (!terms.length) {
+      makeCache.set(word, null);
+      return null;
+    }
+
+    const normalizedWord = normToken(word);
+
+    const bestMatch =
+      terms.find((term) => normToken(term) === normalizedWord) ||
+      terms.find((term) => normToken(term).startsWith(normalizedWord)) ||
+      terms[0];
+
+    makeCache.set(word, bestMatch ? bestMatch.toLowerCase() : null);
+    return bestMatch ? bestMatch.toLowerCase() : null;
   } catch (err) {
     console.error(err);
-    makeCache.set(word, false);
-    return false;
-  } 
+    makeCache.set(word, null);
+    return null;
+  }
 }
 
 const modelTermCache = new Map();
@@ -245,12 +258,13 @@ async function getCars(searchTerm = "") {
 
   // 1) detect make anywhere
   let detectedMake = null;
-  for (const token of rest) {
-    if (await isMake(token)) {
-      detectedMake = token;
-      break;
-    }
+for (const token of rest) {
+  const resolvedMake = await isMake(token);
+  if (resolvedMake) {
+    detectedMake = resolvedMake;
+    break;
   }
+}
 
   // 2) detect colors
   const colorsFound = rest.filter((w) => COLORS.includes(w));
